@@ -5,7 +5,7 @@
     "db": {
       "host": "localhost",
       "user": "root",
-      "password": "",
+      "password": "root@123",
       "database": "Impact"
     }
 }
