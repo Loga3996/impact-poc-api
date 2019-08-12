@@ -20,17 +20,6 @@ const monthWiseRevenueBasedOnYear = (year, result) => {
     sql.query(sql_query, year, result)
 }
 
-// const monthWiseCompanyAmountBasedOnYear = ({ year, company }, result) => {
-//     let sql_query = `select months,sum(amount) as amount,company,mcode,year,code from
-//     (select DATE_FORMAT(ordered_at,'%b-%Y') as months,year(ordered_at)as year,month(ordered_at) as mcode, c.company as code ,c.total_amount as amount,rc.COMPANY_NAME as company from 
-//     cart_orders as c join RMS_IMPACT_COMPANY as rc on c.COMPANY=rc.NUMBER 
-//     where year(ordered_at)=${year} and rc.COMPANY_NAME='${company}')
-//     as selection group by company,months,mcode,year,code order by mcode;`;
-    
-//     console.log("sql", sql_query)
-//     sql.query(sql_query, { year, company }, result);
-// }
-
 const monthWiseCompanyAmountBasedOnYear = ({ year, code }, result) => {
     let sql_query = `select months,sum(amount) as amount,company,mcode,year,code from
     (select DATE_FORMAT(ordered_at,'%b-%Y') as months,year(ordered_at)as year,month(ordered_at) as mcode, c.company as code ,c.total_amount as amount,rc.COMPANY_NAME as company from 

@@ -4,7 +4,6 @@ const companyAmountDetails = (req, callback) => {
     let year = req.body.year;
     let code = req.body.code;
     let mcode = req.body.mcode;
-    console.log(year);
     switch (req.params.apiType) {
         case 'Ym':
             if (year) {
