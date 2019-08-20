@@ -5,8 +5,13 @@ const companyAmountDetails = (req, callback) => {
     let code = req.body.code;
     let mcode = req.body.mcode;
     switch (req.params.apiType) {
-        case 'Ym':
-            if (year) {
+        case 'Cart_Orders_Bill':
+            if (year && code && mcode) {
+                Cart.MonthWisebillOfficeAmountBasedOnCompanyInSpecMonth({ year, code, mcode }, (err, data) => {
+                    if (err) return callback(err);
+                    callback(null, data);
+                })
+            } else if (year) {
                 Cart.SelectCompanyValues(year, (err, data) => {
                     if (err) return callback(err);
                     callback(null, data);
@@ -18,9 +23,9 @@ const companyAmountDetails = (req, callback) => {
                 })
             }
             break;
-        case 'Cart_Orders':
+        case 'Cart_Orders_Amount':
             if (year && code && mcode) {
-                Cart.MonthWiseOfficeAmountBasedOnCompanyInSpecYear({ year, code, mcode }, (err, data) => {
+                Cart.MonthWiseOfficeAmountBasedOnCompanyInSpecMonth({ year, code, mcode }, (err, data) => {
                     if (err) return callback(err);
                     callback(null, data);
                 })
