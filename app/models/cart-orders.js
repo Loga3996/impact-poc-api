@@ -50,7 +50,7 @@ const monthWisebillOfficeAmountBasedOnCompanyInSpecMonth = ({ year, code ,mcode}
     concat(rc.Number,"-" ,rc.COMPANY_NAME) as company from cart_orders as c 
     join RMS_OFFICE as r on c.OFFICE = r.NUMBER 
     join RMS_IMPACT_COMPANY as rc on c.COMPANY=rc.NUMBER 
-    where year(ordered_at)=${year} and rc.NUMBER =${code} and month(ordered_at)=${mcode})
+    where year(ordered_at)=${year} and rc.NUMBER =${code} and month(ordered_at)=${mcode} and c.bill_office !=0)
     as selection group by company,office,code,months`;
     sql.query(sql_query, { year, code,mcode }, result) ;
 }
