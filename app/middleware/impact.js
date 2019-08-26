@@ -1,13 +1,13 @@
 import Cart from '../models/cart-orders';
 
-const companyAmountDetails = (req, callback) => {
+const cartOrdersDetails = (req, callback) => {
     let year = req.body.year;
     let code = req.body.code;
     let mcode = req.body.mcode;
     switch (req.params.apiType) {
         case 'Cart_Orders_Bill':
             if (year && code && mcode) {
-                Cart.MonthWisebillOfficeAmountBasedOnCompanyInSpecMonth({ year, code, mcode }, (err, data) => {
+                Cart.OfficeWisebillOfficeAmountBasedOnCompanyInSpecMonth({ year, code, mcode }, (err, data) => {
                     if (err) return callback(err);
                     callback(null, data);
                 })
@@ -25,7 +25,7 @@ const companyAmountDetails = (req, callback) => {
             break;
         case 'Cart_Orders_Amount':
             if (year && code && mcode) {
-                Cart.MonthWiseOfficeAmountBasedOnCompanyInSpecMonth({ year, code, mcode }, (err, data) => {
+                Cart.OfficeWiseAmountBasedOnCompanyInSpecMonth({ year, code, mcode }, (err, data) => {
                     if (err) return callback(err);
                     callback(null, data);
                 })
@@ -49,6 +49,6 @@ const companyAmountDetails = (req, callback) => {
 }
 module.exports = (() => {
     return {
-        'CompanyAmountDetails': companyAmountDetails
+        'cartOrdersDetails': cartOrdersDetails
     }
 })();
