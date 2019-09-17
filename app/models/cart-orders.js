@@ -6,54 +6,64 @@ const selectYearValues = (result) => {
     sql.query(sql_query, result)
 }
 const selectCompanyValues = (year, result) => {
-    let sql_query = `select company,code from
-    (select concat(rc.Number,"-" ,rc.COMPANY_NAME) as company,rc.Number as code 
+    let sql_query = `select company,companyCode from
+    (select concat(rc.Number,"-" ,rc.COMPANY_NAME) as company,rc.Number as companyCode 
     from cart_orders as c join RMS_IMPACT_COMPANY as rc on c.COMPANY=rc.NUMBER 
-    where year(ordered_at)=${year}) as selection group by company,code;`;
+    where year(ordered_at)=${year}) as selection group by company,companyCode;`;
     sql.query(sql_query, year, result)
 }
 
 const monthWiseRevenueBasedOnYear = (year, result) => {
-    let sql_query = `select DATE_FORMAT(ordered_at,'%b-%Y') as months,month(ordered_at) as mcode,
+    let sql_query = `select DATE_FORMAT(ordered_at,'%b-%Y') as months,month(ordered_at) as monthCode,
     sum(total_amount) as amount from cart_orders 
-    where year(ordered_at)=${year} group by months,mcode order by mcode`;
+    where year(ordered_at)=${year} group by months,monthCode order by monthCode`;
     sql.query(sql_query, year, result)
 }
 
-const monthWiseCompanyAmountBasedOnYear = ({ year, code }, result) => {
-    let sql_query = `select months,sum(amount) as amount,company,mcode,year,code from
+const monthWiseCompanyAmountBasedOnYear = ({ year, companyCode }, result) => {
+    let sql_query = `select months,sum(amount) as amount,company,companyCode,monthCode,year from
     (select DATE_FORMAT(ordered_at,'%b-%Y') as months,year(ordered_at)as year,
-    month(ordered_at) as mcode, c.company as code ,c.total_amount as amount,
+    month(ordered_at) as monthCode, c.company as companyCode ,c.total_amount as amount,
     concat(rc.Number,"-" ,rc.COMPANY_NAME) as company 
     from cart_orders as c join RMS_IMPACT_COMPANY as rc on c.COMPANY=rc.NUMBER 
-    where year(ordered_at)=${year} and rc.NUMBER=${code} and c.total_amount !=0 )
-    as selection group by company,months,mcode,year,code order by mcode;`;
-    sql.query(sql_query, { year, code }, result);
+    where year(ordered_at)=${year} and rc.NUMBER=${companyCode} and c.total_amount !=0 )
+    as selection group by company,months,monthCode,year,companyCode order by monthCode;`;
+    sql.query(sql_query, { year, companyCode }, result);
 }
 
-const officeWiseAmountBasedOnCompanyInSpecMonth = ({ year, code, mcode }, result) => {
-    let sql_query = `select office,sum(Amount) as amount,code,company,months from
+const officeWiseAmountBasedOnCompanyInSpecMonth = ({ year, companyCode, monthCode }, result) => {
+    let sql_query = `select office,sum(Amount) as amount,officeCode,company,months from
     (select c.total_amount as Amount,DATE_FORMAT(ordered_at,'%b-%Y') as months,
-    CONCAT(r.OFFICE_NAME,"-",r.NUMBER) as office, r.NUMBER as code,
+    CONCAT(r.OFFICE_NAME,"-",r.NUMBER) as office, r.NUMBER as officeCode,
     concat(rc.Number,"-" ,rc.COMPANY_NAME) as company 
     from cart_orders as c join RMS_OFFICE as r on c.OFFICE = r.NUMBER 
     join RMS_IMPACT_COMPANY as rc on c.COMPANY=rc.NUMBER 
-    where year(ordered_at)=${year} and rc.NUMBER =${code} 
-    and month(ordered_at)=${mcode} and c.total_amount !=0)
-    as selection group by company,office,code,months`;
-    sql.query(sql_query, { year, code, mcode }, result);
+    where year(ordered_at)=${year} and rc.NUMBER =${companyCode} 
+    and month(ordered_at)=${monthCode} and c.total_amount !=0)
+    as selection group by company,office,officeCode,months`;
+    sql.query(sql_query, { year, companyCode, monthCode }, result);
 }
-const officeWisebillOfficeAmountBasedOnCompanyInSpecMonth = ({ year, code, mcode }, result) => {
-    let sql_query = `select office,sum(bill) as bill,code,company,months from
+const officeWisebillOfficeAmountBasedOnCompanyInSpecMonth = ({ year, companyCode, monthCode }, result) => {
+    let sql_query = `select office,sum(bill) as bill,officeCode,company,months from
     (select c.bill_office as bill,DATE_FORMAT(ordered_at,'%b-%Y') as months,
-    CONCAT(r.OFFICE_NAME,"-",r.NUMBER) as office, r.NUMBER as code,
+    CONCAT(r.OFFICE_NAME,"-",r.NUMBER) as office, r.NUMBER as officeCode,
     concat(rc.Number,"-" ,rc.COMPANY_NAME) as company 
     from cart_orders as c join RMS_OFFICE as r on c.OFFICE = r.NUMBER 
     join RMS_IMPACT_COMPANY as rc on c.COMPANY=rc.NUMBER 
-    where year(ordered_at)=${year} and rc.NUMBER =${code} 
-    and month(ordered_at)=${mcode} and c.bill_office !=0)
-    as selection group by company,office,code,months`;
-    sql.query(sql_query, { year, code, mcode }, result);
+    where year(ordered_at)=${year} and rc.NUMBER =${companyCode} 
+    and month(ordered_at)=${monthCode} and c.bill_office !=0)
+    as selection group by company,office,officeCode,months`;
+    sql.query(sql_query, { year, companyCode, monthCode }, result);
+}
+const topFiveProducts = (result) => {
+    let sql_query = `select total, product from
+    (select cl.sub_total as total,concat(p.id, '-', cl.part_id, '-', p.short_descr) as product
+    from cart_lines as cl join product_part_join as ppj 
+    on (ppj.product_id = cl.product_id or ppj.part_id = cl.part_id)
+    join products as p on (p.id = ppj.product_id)
+	) as selection where product is not null
+	group by product,total order by total desc limit 5`;
+    sql.query(sql_query, result);
 }
 
 module.exports = (() => {
@@ -63,6 +73,7 @@ module.exports = (() => {
         'MonthWiseRevenueBasedOnYear': monthWiseRevenueBasedOnYear,
         'MonthWiseCompanyAmountBasedOnYear': monthWiseCompanyAmountBasedOnYear,
         'OfficeWiseAmountBasedOnCompanyInSpecMonth': officeWiseAmountBasedOnCompanyInSpecMonth,
-        'OfficeWisebillOfficeAmountBasedOnCompanyInSpecMonth': officeWisebillOfficeAmountBasedOnCompanyInSpecMonth
+        'OfficeWisebillOfficeAmountBasedOnCompanyInSpecMonth': officeWisebillOfficeAmountBasedOnCompanyInSpecMonth,
+        'TopFiveProducts': topFiveProducts
     };
 })();
