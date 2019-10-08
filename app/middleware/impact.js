@@ -7,7 +7,7 @@ const cartOrdersDetails = (req, callback) => {
     switch (req.params.apiType) {
         case 'Cart_Orders_Bill':
             if (year && companyCode && monthCode) {
-                Cart.OfficeWisebillOfficeAmountBasedOnCompanyInSpecMonth({ year, companyCode, monthCode }, (err, data) => {
+                Cart.OfficeWiseBillOfficeAmountBasedOnCompanyInSpecMonth({ year, companyCode, monthCode }, (err, data) => {
                     if (err) return callback(err);
                     callback(null, data);
                 })
@@ -31,7 +31,7 @@ const cartOrdersDetails = (req, callback) => {
                 })
             }
             else if (year && companyCode) {
-                Cart.MonthWiseCompanyAmountBasedOnYear({ year, companyCode }, (err, data) => {
+                Cart.MonthWiseRevenueBasedOnYearCompany({ year, companyCode }, (err, data) => {
                     if (err) return callback(err);
                     callback(null, data);
                 })
@@ -41,12 +41,21 @@ const cartOrdersDetails = (req, callback) => {
                     if (err) return callback(err);
                     callback(null, data);
                 })
-            }
-            else {
+            } else {   
                 Cart.TopFiveProducts((err, data) => {
                     if (err) return callback(err);
                     callback(null, data);
                 })
+            }
+            break;
+        case 'Cart_Orders_Promo':
+            if (year && companyCode && monthCode) {
+                Cart.OfficeWiseBillAndPromoAmountBasedOnCompanyInSpecMonth({ year, companyCode, monthCode }, (err, data) => {
+                    if (err) return callback(err);
+                    callback(null, data);
+                })
+            } else {
+                callback(null, []);
             }
             break;
         default:

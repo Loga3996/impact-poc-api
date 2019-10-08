@@ -25,7 +25,4 @@ app.use(cors({
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// import routes from './app/apis/impact-api'; //importing route
-// routes(app);
 app.use(`/cart-orders`, require('./app/apis/impact-api'));
-console.log('server in running');
