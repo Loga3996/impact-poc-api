@@ -1,4 +1,4 @@
-# impact-poc-api
+# IMPACT-POC-API
 
 # General Instructions
  To install the packages 
